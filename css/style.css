@@ -221,6 +221,24 @@ html, body {
   font-style: italic;
 }
 
+/* ---------- Feedback link ---------- */
+
+.feedback {
+  margin-top: auto;
+  padding: 16px 20px;
+  border-top: 1px solid var(--line);
+}
+
+.feedback a {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+}
+.feedback a:hover { color: var(--amber-soft); }
+
 /* ---------- Map ---------- */
 
 .map-wrap {
