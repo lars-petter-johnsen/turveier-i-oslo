@@ -1,8 +1,8 @@
-# Map Overlay
+# Turveier i Oslo
 
-A tiny static site that shows walking/hiking routes on a map. No backend, no build step — plain HTML/CSS/JS, so it deploys straight to GitHub Pages.
+A tiny static site that shows Oslo's marked walking trails (turveier) on a map. No backend, no build step — plain HTML/CSS/JS, so it deploys straight to GitHub Pages.
 
-Currently set up for **Oslo turveier** (Oslo's marked walking trails), but it works with any GPX or GeoJSON track data — see [Add a permanent route](#add-a-permanent-route-to-the-site) below.
+It works with any GPX or GeoJSON track data, so it's easy to repurpose for routes elsewhere too — see [Add a permanent route](#add-a-permanent-route-to-the-site) below.
 
 **Stack:** [Leaflet.js](https://leafletjs.com/) + OpenStreetMap tiles for the map, the [leaflet-gpx](https://github.com/mpetazzoni/leaflet-gpx) plugin to parse `.gpx` files, and Leaflet's built-in `L.geoJSON` for `.geojson` files (handy for trail exports from [Overpass Turbo](https://overpass-turbo.eu/)).
 
