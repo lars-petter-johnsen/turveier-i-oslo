@@ -7,11 +7,6 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19
 }).addTo(map);
 
-map.on('mousemove', (e) => {
-  document.getElementById('cur-lat').textContent = e.latlng.lat.toFixed(4);
-  document.getElementById('cur-lon').textContent = e.latlng.lng.toFixed(4);
-});
-
 const PALETTE = ['#2f6f6d', '#b5533c', '#3d4f91', '#7a8450', '#a35b8f'];
 let colorIndex = 0;
 function nextColor() {

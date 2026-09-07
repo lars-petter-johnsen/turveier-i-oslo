@@ -221,20 +221,6 @@ html, body {
   font-style: italic;
 }
 
-/* Instrument readout */
-
-.instrument {
-  margin-top: auto;
-  padding: 16px 20px;
-  border-top: 1px solid var(--line);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: var(--muted);
-  display: flex;
-  justify-content: space-between;
-}
-.instrument span { color: var(--amber-soft); }
-
 /* ---------- Map ---------- */
 
 .map-wrap {
