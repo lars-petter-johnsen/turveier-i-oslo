@@ -273,6 +273,8 @@ html, body {
 }
 .map-fab:hover { background: var(--ink-soft); color: var(--amber); }
 .map-fab.locating { color: var(--amber); animation: pulse 1s ease-in-out infinite; }
+.map-fab.following { background: var(--amber); color: var(--ink); border-color: var(--amber); }
+.map-fab.paused { color: var(--amber); border-color: var(--amber); }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }

@@ -284,51 +284,114 @@ toggleAllBtn.addEventListener('click', () => {
   });
 });
 
-// ---------- Find my location ----------
+// ---------- Find my location / Follow me ----------
+//
+// Three states, cycled by clicking the button:
+//   off -> following (watch + auto-recenter on every fix)
+//   following -> paused (still watching/updating the dot, but a manual
+//     drag means we stop yanking the view back on every fix)
+//   paused -> off (stop watching entirely)
 
 let userLocationMarker = null;
 let userAccuracyCircle = null;
+let watchId = null;
+let autoCenter = false;
+let lastLatLng = null;
 
 const locateBtn = document.getElementById('locate-btn');
 
-locateBtn.addEventListener('click', () => {
+function setLocateState(state) {
+  locateBtn.classList.remove('locating', 'following', 'paused');
+  if (state) locateBtn.classList.add(state);
+  const labels = {
+    locating: 'Finding your location…',
+    following: 'Following your location (tap to pause)',
+    paused: 'Location paused (tap to resume, or hold to stop)'
+  };
+  const label = labels[state] || 'Follow my location';
+  locateBtn.title = label;
+  locateBtn.setAttribute('aria-label', label);
+}
+
+function renderUserLocation(latlng, accuracy) {
+  if (userLocationMarker) map.removeLayer(userLocationMarker);
+  if (userAccuracyCircle) map.removeLayer(userAccuracyCircle);
+
+  userAccuracyCircle = L.circle(latlng, {
+    radius: accuracy,
+    color: '#c8843c',
+    weight: 1,
+    fillColor: '#c8843c',
+    fillOpacity: 0.08
+  }).addTo(map);
+
+  userLocationMarker = L.circleMarker(latlng, {
+    radius: 7,
+    color: '#f6f3ea',
+    weight: 2,
+    fillColor: '#c8843c',
+    fillOpacity: 1
+  }).addTo(map);
+}
+
+function stopFollowing() {
+  if (watchId !== null) {
+    navigator.geolocation.clearWatch(watchId);
+    watchId = null;
+  }
+  autoCenter = false;
+  setLocateState(null);
+}
+
+function startFollowing() {
   if (!navigator.geolocation) {
     alert('Geolocation is not supported by this browser.');
     return;
   }
 
-  locateBtn.classList.add('locating');
+  setLocateState('locating');
+  autoCenter = true;
+  let firstFix = true;
 
-  navigator.geolocation.getCurrentPosition(
+  watchId = navigator.geolocation.watchPosition(
     (pos) => {
-      locateBtn.classList.remove('locating');
       const { latitude, longitude, accuracy } = pos.coords;
+      lastLatLng = [latitude, longitude];
+      renderUserLocation(lastLatLng, accuracy);
 
-      if (userLocationMarker) map.removeLayer(userLocationMarker);
-      if (userAccuracyCircle) map.removeLayer(userAccuracyCircle);
-
-      userAccuracyCircle = L.circle([latitude, longitude], {
-        radius: accuracy,
-        color: '#c8843c',
-        weight: 1,
-        fillColor: '#c8843c',
-        fillOpacity: 0.08
-      }).addTo(map);
-
-      userLocationMarker = L.circleMarker([latitude, longitude], {
-        radius: 7,
-        color: '#f6f3ea',
-        weight: 2,
-        fillColor: '#c8843c',
-        fillOpacity: 1
-      }).addTo(map);
-
-      map.flyTo([latitude, longitude], 15);
+      if (firstFix) {
+        map.flyTo(lastLatLng, 16);
+        firstFix = false;
+      } else if (autoCenter) {
+        map.panTo(lastLatLng, { animate: true, duration: 0.5 });
+      }
+      setLocateState(autoCenter ? 'following' : 'paused');
     },
     (err) => {
-      locateBtn.classList.remove('locating');
       alert('Could not get your location: ' + err.message);
+      stopFollowing();
     },
-    { enableHighAccuracy: true, timeout: 10000 }
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 5000 }
   );
+}
+
+locateBtn.addEventListener('click', () => {
+  if (watchId === null) {
+    startFollowing();
+  } else if (autoCenter) {
+    autoCenter = false;
+    setLocateState('paused');
+  } else {
+    stopFollowing();
+  }
+});
+
+// A manual drag while following means the user wants to look elsewhere on
+// the map, not get yanked back on the next GPS fix — pause auto-recenter
+// but keep the dot itself updating.
+map.on('dragstart', () => {
+  if (watchId !== null && autoCenter) {
+    autoCenter = false;
+    setLocateState('paused');
+  }
 });
