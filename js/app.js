@@ -99,6 +99,8 @@ function createListItem(name, color, removable) {
     li.querySelector('button').addEventListener('click', () => removeTrack(id));
   }
 
+  updateToggleAllButton();
+
   return { id, li };
 }
 
@@ -266,11 +268,10 @@ const toggleAllBtn = document.getElementById('deselect-all-btn');
 
 function updateToggleAllButton() {
   const checkboxes = document.querySelectorAll('#route-list input[type="checkbox"]');
+  if (checkboxes.length === 0) return; // no routes loaded yet — keep the default label
   const anyChecked = Array.from(checkboxes).some((cb) => cb.checked);
   toggleAllBtn.textContent = anyChecked ? 'Deselect all' : 'Select all';
 }
-
-updateToggleAllButton();
 
 toggleAllBtn.addEventListener('click', () => {
   const checkboxes = document.querySelectorAll('#route-list input[type="checkbox"]');
